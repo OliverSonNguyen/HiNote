@@ -11,11 +11,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import sample.test.hinote.databinding.FragmentHomeBinding
+import sample.test.hinote.home.tool.HomeViewModelFactory
 import sample.test.hinote.home.view.adapter.HomeAdapter
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels {
+        HomeViewModelFactory(requireContext())
+    }
     private lateinit var adapter: HomeAdapter
     override fun onCreateView(
         inflater: LayoutInflater,
