@@ -1,0 +1,41 @@
+package sample.test.hinote.home.view.adapter
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import sample.test.hinote.databinding.RowHomeBinding
+import sample.test.hinote.home.data.local.Note
+
+class NoteDiff : DiffUtil.ItemCallback<Note>() {
+    override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
+        return (oldItem.title == newItem.title && oldItem.content == newItem.content && oldItem.updatedDate == newItem.updatedDate)
+    }
+
+    override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
+        return oldItem == newItem
+    }
+}
+
+class HomeAdapter(private val itemClickCallback: ((Note) -> Unit)?) :
+    ListAdapter<Note, HomeAdapter.HomeViewHolder>(NoteDiff()) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeViewHolder {
+        val binding = RowHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return HomeViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: HomeViewHolder, position: Int) {
+        holder.bind(getItem(position), itemClickCallback)
+    }
+
+    class HomeViewHolder(private val binding: RowHomeBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: Note, itemClickCallback: ((Note) -> Unit)?) {
+            binding.rowTitle.text = item.title
+            binding.root.setOnClickListener {
+                itemClickCallback?.invoke(item)
+            }
+        }
+    }
+}
