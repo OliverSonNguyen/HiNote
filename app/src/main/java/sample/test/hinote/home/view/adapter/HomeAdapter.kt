@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import sample.test.hinote.databinding.RowHomeBinding
 import sample.test.hinote.home.data.local.Note
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class NoteDiff : DiffUtil.ItemCallback<Note>() {
     override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
@@ -20,19 +22,27 @@ class NoteDiff : DiffUtil.ItemCallback<Note>() {
 
 class HomeAdapter(private val itemClickCallback: ((Note) -> Unit)?) :
     ListAdapter<Note, HomeAdapter.HomeViewHolder>(NoteDiff()) {
+    private val dateFormat: SimpleDateFormat =
+        SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeViewHolder {
         val binding = RowHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return HomeViewHolder(binding)
+        return HomeViewHolder(binding, dateFormat)
     }
 
     override fun onBindViewHolder(holder: HomeViewHolder, position: Int) {
         holder.bind(getItem(position), itemClickCallback)
     }
 
-    class HomeViewHolder(private val binding: RowHomeBinding) :
+    class HomeViewHolder(
+        private val binding: RowHomeBinding,
+        private val dateFormat: SimpleDateFormat
+    ) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Note, itemClickCallback: ((Note) -> Unit)?) {
             binding.rowTitle.text = item.title
+            binding.rowContent.text = item.content
+            binding.rowUpdatedDate.text = dateFormat.format(item.updatedDate)
             binding.root.setOnClickListener {
                 itemClickCallback?.invoke(item)
             }

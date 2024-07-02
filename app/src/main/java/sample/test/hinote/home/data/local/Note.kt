@@ -11,5 +11,5 @@ data class Note(
     val content: String?,
     val createdDate: Date = Calendar.getInstance().time,
     val updatedDate: Date = Calendar.getInstance().time,
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 )

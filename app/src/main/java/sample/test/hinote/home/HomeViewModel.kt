@@ -1,5 +1,6 @@
 package sample.test.hinote.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,11 +14,6 @@ class HomeViewModel(private val noteRepository: NoteRepository) : ViewModel() {
     val uiState = _uiState.asStateFlow()
     fun start() {
         viewModelScope.launch {
-            // mock data
-//            val items = mutableListOf<Note>()
-//            for (i in 0..20) {
-//                items.add(Note("Note $i", "Content $i"))
-//            }
             try {
                 val items = noteRepository.getNotes()
                 val uiState = UiState.UiStateLoaded(items = items)

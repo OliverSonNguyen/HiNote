@@ -10,9 +10,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
+import sample.test.hinote.R
 import sample.test.hinote.databinding.FragmentHomeBinding
+import sample.test.hinote.home.data.local.Note
 import sample.test.hinote.home.tool.HomeViewModelFactory
 import sample.test.hinote.home.view.adapter.HomeAdapter
+import sample.test.hinote.notedetails.NoteDetailFragment
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
@@ -39,10 +42,16 @@ class HomeFragment : Fragment() {
     private fun initView() {
         adapter = HomeAdapter { item ->
             Log.d("", ">>>item click:$item")
+            navigateToNoteDetailFragment(item)
         }
         binding.homeRcv.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.homeRcv.adapter = adapter
+        parentFragmentManager.addOnBackStackChangedListener {
+            if (parentFragmentManager.backStackEntryCount == 0) {
+                viewModel.start()
+            }
+        }
     }
 
     private fun observeData() {
@@ -66,6 +75,14 @@ class HomeFragment : Fragment() {
             }
         }
 
+    }
+
+    private fun navigateToNoteDetailFragment(note: Note) {
+        val fragment = NoteDetailFragment.newInstance(note.id)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.homeContainer, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
 }

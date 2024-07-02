@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">HiNote</string>
+    <string name="title">Title</string>
+    <string name="note">Note</string>
+    <string name="add_note">Add Note</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
 </resources>
