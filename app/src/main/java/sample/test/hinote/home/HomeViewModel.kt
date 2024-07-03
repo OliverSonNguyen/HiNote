@@ -12,10 +12,25 @@ import sample.test.hinote.home.data.local.Note
 class HomeViewModel(private val noteRepository: NoteRepository) : ViewModel() {
     private val _uiState = MutableStateFlow<UiState>(UiState.UiStateLoading)
     val uiState = _uiState.asStateFlow()
-    fun start() {
+    private val loadedNotes = mutableListOf<Note>()
+    private var offset = 0
+    private val limit = 13
+    fun loadNotes(refresh: Boolean = false) {
+        Log.d("HomeViewModel", ">>>loadNote offset:$offset -  refresh:$refresh")
         viewModelScope.launch {
             try {
-                val items = noteRepository.getNotes()
+                if (refresh) {
+                    offset = 0
+                    loadedNotes.clear()
+                }
+//                val items = noteRepository.getNotes(offset, limit)
+                val items = noteRepository.getAllNotes()
+                Log.d("HomeViewModel", ">>>  items:${items.size} refresh:$refresh")
+                if (items.isNotEmpty()) {
+                    loadedNotes.addAll(items)
+                    offset += items.size
+                }
+//                val uiState = UiState.UiStateLoaded(items = loadedNotes)
                 val uiState = UiState.UiStateLoaded(items = items)
                 _uiState.value = uiState
             } catch (e: Exception) {

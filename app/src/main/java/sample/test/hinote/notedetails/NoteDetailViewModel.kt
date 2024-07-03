@@ -2,6 +2,7 @@ package sample.test.hinote.notedetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -13,12 +14,13 @@ import sample.test.hinote.home.data.local.Note
 import java.util.Calendar
 import java.util.Date
 
+@FlowPreview
 class NoteDetailViewModel(private val noteRepository: NoteRepository) : ViewModel() {
-    private val _uiState = MutableStateFlow<UiState>(UiState.UiStateEdit())
+    private val _uiState = MutableStateFlow<UiState>(UiState.UiStateInit)
     val uiState = _uiState.asStateFlow()
 
-    private val _titleState = MutableStateFlow<String>("")
-    private val _contentState = MutableStateFlow<String>("")
+    private val _titleState = MutableStateFlow("")
+    private val _contentState = MutableStateFlow("")
     private var currNodeId: Long? = null
     private var createdDate: Date? = null
     private var modeView: Boolean = false
@@ -27,9 +29,9 @@ class NoteDetailViewModel(private val noteRepository: NoteRepository) : ViewMode
         viewModelScope.launch {
             combine(_titleState, _contentState) { title, content ->
                 if (modeView || (title.isEmpty() && content.isEmpty())) {
-                    _uiState.value = UiState.UiStateEdit()
+                    _uiState.value = UiState.UiStateInit
                 } else {
-                    _uiState.value = UiState.UiStateEdit(message = "Typing....")
+                    _uiState.value = UiState.UiStateEditing
                 }
                 title to content
             }.debounce(500)
@@ -51,7 +53,7 @@ class NoteDetailViewModel(private val noteRepository: NoteRepository) : ViewMode
                         val nodeId = noteRepository.insert(Note(title, content))
                         currNodeId = nodeId
                     }
-                    _uiState.value = UiState.UiStateEdit(message = "Saved")
+                    _uiState.value = UiState.UiStateSaved
                 }
         }
 
@@ -59,12 +61,10 @@ class NoteDetailViewModel(private val noteRepository: NoteRepository) : ViewMode
 
     fun onTitleUpdated(newTitle: String) {
         _titleState.value = newTitle
-
     }
 
     fun onContentUpdated(newContent: String) {
         _contentState.value = newContent
-
     }
 
     fun loadNote(noteId: Long) {
@@ -94,7 +94,9 @@ class NoteDetailViewModel(private val noteRepository: NoteRepository) : ViewMode
 
     sealed class UiState {
         //let update user when app save when user type
-        data class UiStateEdit(val message: String? = "") : UiState()
+        data object UiStateInit : UiState()
+        data object UiStateEditing : UiState()
+        data object UiStateSaved : UiState()
         data class UiStateView(val node: Note) : UiState()
         data class UiStateDelete(val id: Long) : UiState()
     }
