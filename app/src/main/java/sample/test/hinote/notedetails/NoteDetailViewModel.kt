@@ -2,7 +2,6 @@ package sample.test.hinote.notedetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -14,7 +13,6 @@ import sample.test.hinote.home.data.local.Note
 import java.util.Calendar
 import java.util.Date
 
-@FlowPreview
 class NoteDetailViewModel(private val noteRepository: NoteRepository) : ViewModel() {
     private val _uiState = MutableStateFlow<UiState>(UiState.UiStateInit)
     val uiState = _uiState.asStateFlow()
