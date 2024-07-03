@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModelProvider
 import sample.test.hinote.home.HomeViewModel
 import sample.test.hinote.home.data.NoteRepositoryImpl
 import sample.test.hinote.home.data.local.AppDatabase
-import java.lang.IllegalArgumentException
 
+//remove when using Hilt or dagger
 @Suppress("UNCHECKED_CAST")
 class HomeViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

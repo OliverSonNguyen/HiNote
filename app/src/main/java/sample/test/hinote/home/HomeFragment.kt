@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,10 +23,24 @@ import sample.test.hinote.notedetails.NoteDetailFragment
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
+
+    //using Hilt for injection
     private val viewModel: HomeViewModel by viewModels {
         HomeViewModelFactory(requireContext())
     }
     private lateinit var adapter: HomeAdapter
+    private val backtrackChange = FragmentManager.OnBackStackChangedListener {
+        if (parentFragmentManager.backStackEntryCount == 0) {
+            viewModel.refresh()
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        parentFragmentManager.addOnBackStackChangedListener(backtrackChange)
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,7 +54,6 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initView()
         observeData()
-        viewModel.loadNotes(true)
     }
 
     private fun initView() {
@@ -50,16 +64,6 @@ class HomeFragment : Fragment() {
             Log.d("", ">>>item click:$item")
             navigateToNoteDetailFragment(item)
         }
-        val observer = object : RecyclerView.AdapterDataObserver() {
-            override fun onChanged() {
-                binding.homeRcv.scrollToPosition(0)
-            }
-
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                binding.homeRcv.scrollToPosition(0)
-            }
-        }
-        adapter.registerAdapterDataObserver(observer)
         binding.homeRcv.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.homeRcv.adapter = adapter
@@ -72,27 +76,15 @@ class HomeFragment : Fragment() {
                 val pastVisibleItems = layoutManager.findFirstVisibleItemPosition()
 
                 if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                    viewModel.loadNotes()
+                    viewModel.loadMore()
                 }
-//                super.onScrolled(recyclerView, dx, dy)
-//                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-//                if (layoutManager.findLastVisibleItemPosition() == adapter.itemCount - 1) {
-//                    viewModel.loadNotes()
-//                }
             }
         })
-//        parentFragmentManager.addOnBackStackChangedListener {
-//            if (parentFragmentManager.backStackEntryCount == 0) {
-//                Log.d("",">>>backStackEntryCount == 0 hash:${hashCode()} - vmhash:${viewModel.hashCode()}")
-//                viewModel.loadNotes(true)
-//            }
-//        }
     }
 
     private fun observeData() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collect { uiState ->
-                Log.d("", ">>>uiState:$uiState")
                 when (uiState) {
                     is HomeViewModel.UiState.UiStateLoading -> {
                         binding.loadingIndicator.isVisible = true
@@ -106,12 +98,10 @@ class HomeFragment : Fragment() {
                     is HomeViewModel.UiState.UiStateError -> {
                         binding.loadingIndicator.isVisible = false
                         Toast.makeText(requireContext(), uiState.message, Toast.LENGTH_SHORT).show()
-
                     }
                 }
             }
         }
-
     }
 
     private fun navigateToNoteDetailFragment(note: Note? = null) {
@@ -122,4 +112,11 @@ class HomeFragment : Fragment() {
             .addToBackStack(null)
             .commit()
     }
+
+    override fun onDestroy() {
+        parentFragmentManager.removeOnBackStackChangedListener(backtrackChange)
+        super.onDestroy()
+    }
+
+
 }

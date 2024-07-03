@@ -7,7 +7,6 @@ import sample.test.hinote.home.data.local.NoteDao
 
 interface NoteRepository {
     suspend fun getAllNotes(): List<Note>
-    suspend fun getNotes(offset: Int, limit: Int): List<Note>
     suspend fun getNote(nodeId: Long): Note?
     suspend fun insert(note: Note): Long
     suspend fun update(note: Note)
@@ -19,12 +18,6 @@ class NoteRepositoryImpl(private val noteDao: NoteDao) : NoteRepository {
     override suspend fun getAllNotes(): List<Note> {
         return withContext(Dispatchers.IO) {
             noteDao.getAllNote()
-        }
-    }
-
-    override suspend fun getNotes(offset: Int, limit: Int): List<Note> {
-        return withContext(Dispatchers.IO) {
-            noteDao.getNotes(offset, limit)
         }
     }
 

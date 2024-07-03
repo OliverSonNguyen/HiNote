@@ -9,11 +9,9 @@ import androidx.room.Update
 
 @Dao
 interface NoteDao {
-    @Query("SELECT * FROM note ORDER BY updatedDate DESC")
+    @Query("SELECT * FROM note ORDER BY createdDate DESC")
     suspend fun getAllNote(): List<Note>
 
-    @Query("SELECT * FROM note ORDER BY updatedDate DESC LIMIT :limit OFFSET :offset")
-    suspend fun getNotes(offset: Int, limit: Int): List<Note>
 
     @Query("SELECT * FROM note WHERE id = :noteId LIMIT 1")
     suspend fun getNote(noteId: Long): Note?

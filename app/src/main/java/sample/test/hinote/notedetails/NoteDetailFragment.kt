@@ -1,11 +1,13 @@
 package sample.test.hinote.notedetails
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -145,6 +147,13 @@ class NoteDetailFragment : Fragment() {
     private fun enableEditing(enable: Boolean) {
         binding.edtTitle.isEnabled = enable
         binding.edtContent.isEnabled = enable
-        if (enable) binding.edtTitle.requestFocus()
+        if (enable){
+            binding.edtTitle.requestFocus()
+            showKeyboard(binding.edtTitle)
+        }
+    }
+    private fun showKeyboard(view: View) {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
     }
 }
